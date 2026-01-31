@@ -4,7 +4,7 @@ This guide covers all configuration options for `@dcapslock/hass-jest-environmen
 
 ## Jest Configuration
 
-### Basic Configuration
+### Basic Configuration (Node Environment)
 
 The simplest configuration in `jest.config.js`:
 
@@ -15,6 +15,18 @@ module.exports = {
 ```
 
 This will use default values and read from environment variables.
+
+### Basic Configuration (jsdom Environment)
+
+For DOM/UI testing (custom cards, UI components):
+
+```javascript
+module.exports = {
+  testEnvironment: '@dcapslock/hass-jest-environment/jsdom',
+};
+```
+
+This provides both DOM APIs and Home Assistant integration.
 
 ### Full Configuration
 
@@ -28,6 +40,35 @@ module.exports = {
     connectionTimeout: 30000,
   },
 };
+```
+
+### Mixed Environments (Node + jsdom)
+
+Use different environments for different test files:
+
+```javascript
+// jest.config.js - default to Node
+module.exports = {
+  testEnvironment: '@dcapslock/hass-jest-environment',
+  testEnvironmentOptions: {
+    hassUrl: process.env.HA_URL,
+    accessToken: process.env.HA_TOKEN,
+    mockFallback: true,
+  },
+};
+```
+
+Then use docblock comments in specific test files:
+
+```typescript
+/**
+ * @jest-environment @dcapslock/hass-jest-environment/jsdom
+ */
+
+// This file uses jsdom environment
+describe('Card Tests', () => {
+  // Has DOM + HA access
+});
 ```
 
 ## Configuration Options

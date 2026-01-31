@@ -4,6 +4,16 @@
   "description": "A Jest environment for testing against a real Home Assistant instance using WebSocket connection with long-lived access tokens",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./jsdom": {
+      "types": "./dist/jsdom.d.ts",
+      "default": "./dist/jsdom.js"
+    }
+  },
   "keywords": [
     "home-assistant",
     "jest",
@@ -38,6 +48,7 @@
   },
   "dependencies": {
     "home-assistant-js-websocket": "^9.6.0",
+    "jest-environment-jsdom": "^29.0.0",
     "jest-environment-node": "^29.0.0"
   },
   "devDependencies": {

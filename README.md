@@ -39,7 +39,7 @@ yarn add -D @dcapslock/hass-jest-environment
 
 ## ⚙️ Configuration
 
-### Basic Setup
+### Basic Setup (Node Environment)
 
 Add to your `jest.config.js`:
 
@@ -53,6 +53,46 @@ module.exports = {
     connectionTimeout: 30000, // 30 second timeout
   },
 };
+```
+
+### Using with jsdom (for DOM/UI Testing)
+
+If you need DOM APIs (for testing custom cards, UI components, etc.) along with Home Assistant integration, use the jsdom variant:
+
+```javascript
+module.exports = {
+  testEnvironment: '@dcapslock/hass-jest-environment/jsdom',
+  testEnvironmentOptions: {
+    hassUrl: process.env.HA_URL || 'http://localhost:8123',
+    accessToken: process.env.HA_TOKEN,
+    mockFallback: true,
+    connectionTimeout: 30000,
+  },
+};
+```
+
+This provides:
+- Full DOM APIs (document, window, etc.)
+- Home Assistant connection and state access
+- Ideal for testing Lovelace cards, UI components, or any code that needs both DOM and Home Assistant
+
+### Per-File Environment Selection
+
+You can use different environments for different test files using docblock comments:
+
+```typescript
+/**
+ * @jest-environment @dcapslock/hass-jest-environment/jsdom
+ */
+
+describe('Custom Card Tests', () => {
+  it('should render with HA data', () => {
+    // Has both DOM and Home Assistant access
+    const div = document.createElement('div');
+    const state = hass?.states['sensor.temperature'];
+    div.textContent = `Temperature: ${state?.state}`;
+  });
+});
 ```
 
 ### Environment Variables
@@ -129,6 +169,46 @@ describe('Service Call Tests', () => {
     // Verify state changed
     const state = hass?.states['light.test_light'];
     expect(state?.state).toBe('on');
+  });
+});
+```
+
+### DOM/UI Component Testing Example (with jsdom)
+
+```typescript
+/**
+ * @jest-environment @dcapslock/hass-jest-environment/jsdom
+ */
+
+describe('Lovelace Card Tests', () => {
+  it('should render custom card with live HA data', () => {
+    if (hassMode === 'mock') {
+      console.log('Skipping in mock mode');
+      return;
+    }
+
+    // Create DOM elements
+    const card = document.createElement('ha-custom-card');
+    document.body.appendChild(card);
+
+    // Get real Home Assistant data
+    const temperature = hass?.states['sensor.temperature'];
+    
+    // Update card with real data
+    card.setAttribute('entity', 'sensor.temperature');
+    card.textContent = `${temperature?.state}°${temperature?.attributes?.unit_of_measurement}`;
+
+    expect(card.textContent).toContain(temperature?.state);
+    expect(document.body.contains(card)).toBe(true);
+  });
+
+  it('should test template rendering with window/document', () => {
+    // Has access to browser APIs
+    expect(window).toBeDefined();
+    expect(document).toBeDefined();
+    
+    // Also has Home Assistant data
+    expect(hass?.states).toBeDefined();
   });
 });
 ```
@@ -219,6 +299,54 @@ it('should handle mock mode', () => {
   expect(hass?.states).toBeDefined();
 });
 ```
+
+## ❓ Frequently Asked Questions
+
+### Can I use this with jsdom?
+
+**Yes!** This package provides two variants:
+
+1. **Node environment** (default): `@dcapslock/hass-jest-environment`
+   - Use for backend code, API integration tests, template libraries
+   - No DOM APIs available
+
+2. **jsdom environment**: `@dcapslock/hass-jest-environment/jsdom`
+   - Use for UI components, Lovelace cards, frontend testing
+   - Provides full DOM APIs (document, window, etc.) + Home Assistant integration
+
+See the [Using with jsdom](#using-with-jsdom-for-domui-testing) section above for configuration examples.
+
+### Can I use both Node and jsdom environments in the same project?
+
+**Yes!** Use per-file environment selection with docblock comments:
+
+```typescript
+// backend.test.ts - Uses Node environment (default)
+describe('API Tests', () => {
+  // ...
+});
+```
+
+```typescript
+/**
+ * @jest-environment @dcapslock/hass-jest-environment/jsdom
+ */
+
+// card.test.ts - Uses jsdom environment
+describe('Card Tests', () => {
+  // Has DOM + HA access
+});
+```
+
+### What's the difference between Node and jsdom environments?
+
+| Feature | Node Environment | jsdom Environment |
+|---------|-----------------|-------------------|
+| Home Assistant access | ✅ Yes | ✅ Yes |
+| `hass` global | ✅ Yes | ✅ Yes |
+| DOM APIs (document, window) | ❌ No | ✅ Yes |
+| Best for | Backend, API, templates | UI, cards, frontend |
+| Package path | `@dcapslock/hass-jest-environment` | `@dcapslock/hass-jest-environment/jsdom` |
 
 ## 🔧 CI/CD Integration
 
