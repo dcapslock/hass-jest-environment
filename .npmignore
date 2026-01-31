@@ -4,7 +4,7 @@ docs/
 *.test.ts
 tsconfig.json
 jest.config.js
-.eslintrc.json
+eslint.config.mjs
 .prettierrc.json
 .gitignore
 .env*

@@ -1,6 +1,6 @@
 /**
  * Service call example
- * 
+ *
  * This example shows how to test service calls
  * WARNING: These tests make real changes to your Home Assistant instance!
  * Use with caution and consider testing against a development instance.
@@ -58,7 +58,7 @@ describe('Home Assistant Service Calls', () => {
 
     const services = hass?.services || {};
     const hasLightService = 'light' in services;
-    
+
     if (hasLightService) {
       const lightServices = Object.keys(services.light);
       console.log(`Available light services: ${lightServices.join(', ')}`);

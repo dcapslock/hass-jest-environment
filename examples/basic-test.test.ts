@@ -1,6 +1,6 @@
 /**
  * Basic test example showing how to access Home Assistant states
- * 
+ *
  * Run with:
  * HA_URL=http://localhost:8123 HA_TOKEN=your_token jest examples/basic-test.test.ts
  */
@@ -37,11 +37,11 @@ describe('Home Assistant Basic Tests', () => {
 
     const states = hass?.states || {};
     const entityIds = Object.keys(states);
-    
+
     if (entityIds.length > 0) {
       const firstEntity = states[entityIds[0]];
       console.log(`First entity: ${entityIds[0]} = ${firstEntity.state}`);
-      
+
       expect(firstEntity).toBeDefined();
       expect(firstEntity.state).toBeDefined();
       expect(firstEntity.attributes).toBeDefined();

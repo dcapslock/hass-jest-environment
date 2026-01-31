@@ -12,9 +12,9 @@ export interface HassEnvironmentConfig {
 
 /**
  * Custom Jest Environment that provides a real Home Assistant connection
- * 
+ *
  * Configuration via jest.config.js:
- * 
+ *
  * ```js
  * module.exports = {
  *   testEnvironment: '@dcapslock/hass-jest-environment',
@@ -34,7 +34,7 @@ export default class HassEnvironment extends NodeEnvironment {
 
   constructor(config: JestEnvironmentConfig, context: EnvironmentContext) {
     super(config, context);
-    
+
     this.config = {
       hassUrl: process.env.HA_URL || 'http://localhost:8123',
       accessToken: process.env.HA_TOKEN,
@@ -59,7 +59,7 @@ export default class HassEnvironment extends NodeEnvironment {
       }
       throw new Error(
         'HA_TOKEN environment variable is required. ' +
-        'Generate one in Home Assistant: Profile → Long-Lived Access Tokens'
+          'Generate one in Home Assistant: Profile → Long-Lived Access Tokens'
       );
     }
 
@@ -83,7 +83,9 @@ export default class HassEnvironment extends NodeEnvironment {
       console.log(`✅ Connected to Home Assistant at ${hassUrl}`);
     } catch (error) {
       if (mockFallback) {
-        console.warn(`⚠️  Failed to connect to Home Assistant, falling back to mock mode: ${error}`);
+        console.warn(
+          `⚠️  Failed to connect to Home Assistant, falling back to mock mode: ${error}`
+        );
         this.global.hass = null;
         this.global.hassMode = 'mock';
       } else {
